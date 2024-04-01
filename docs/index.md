@@ -1,0 +1,2 @@
+Kikwik/AdminkBundle documentation
+=================================

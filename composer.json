@@ -1,0 +1,26 @@
+{
+    "name": "kikwik/admink-bundle",
+    "description": "Admin for Symfony 6.4",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Davide Scarpato",
+            "email": "davide@kikwik.it"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/framework-bundle": "^6.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kikwik\\AdminkBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Kikwik\\AdminkBundle\\Tests\\": "tests/"
+        }
+    }
+}
