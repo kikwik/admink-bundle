@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing
+        https://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <route id="kikwik_admink_dashboard"
+           path="/"
+           controller="kikwik_admink.controller.dashboard_controller::index"
+           methods="GET"/>
+
+    <route id="kikwik_admink_clear_cache"
+           path="/_clear_cache"
+           controller="kikwik_admink.controller.dashboard_controller::clearCache"
+           methods="GET"/>
+
+    <import resource="." type="kikwik_admink_routes"/>
+</routes>
