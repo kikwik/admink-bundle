@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Elenco {{ pluralName }}{% endblock %}
+
+{% block body %}
+    <h1>Elenco {{ pluralName }}</h1>
+    <a href="{{ path(baseRouteName~'_new') }}"><i class="fa-solid fa-plus"></i></a>
+
+    <p>{{ pager.nbResults }} {{ pluralName }}</p>
+    <div class="table-responsive small">
+        <table class="table table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>Azioni</th>
+                    {% for fieldName, label in listFields %}
+                        <th>{{ label }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for object in pager %}
+                    <tr>
+                        <td class="actions">
+                            <a href="{{ path(baseRouteName~'_edit', { id: object.id }) }}"><i class="fa-solid fa-pencil"></i></a>
+                        </td>
+                        {% for fieldName, label in listFields %}
+                            <td>{{ attribute(object,fieldName) }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {{ pagerfanta(pager) }}
+{% endblock %}

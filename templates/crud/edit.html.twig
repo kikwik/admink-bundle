@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+    <h1>Modifica {{ singularName }} {{ object }}</h1>
+
+
+
+    {{ form_start(form, {attr: {'novalidate': 'novalidate'}}) }}
+        {{ form_widget(form) }}
+        <button type="submit" class="btn btn-primary">Salva</button>
+    {{ form_end(form) }}
+
+{% endblock %}
