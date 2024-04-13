@@ -9,7 +9,7 @@
     <p>{{ pager.nbResults }} {{ pluralName }}</p>
     <div class="table-responsive small">
         <table class="table table-hover table-striped">
-            <thead>
+            <thead class="table-primary">
                 <tr>
                     <th>Azioni</th>
                     {% for fieldName, label in listFields %}
@@ -17,7 +17,7 @@
                     {% endfor %}
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="table-group-divider">
                 {% for object in pager %}
                     <tr>
                         <td class="actions">

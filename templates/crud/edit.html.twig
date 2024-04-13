@@ -1,10 +1,9 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Modifica {{ singularName }} {{ object | striptags }}{% endblock %}
 
 {% block body %}
     <h1>Modifica {{ singularName }} {{ object }}</h1>
-
-
 
     {{ form_start(form, {attr: {'novalidate': 'novalidate'}}) }}
         {{ form_widget(form) }}
