@@ -12,6 +12,7 @@ class KikwikAdminkBundle extends AbstractBundle
     {
         // load an XML, PHP or Yaml file
         $container->import('../config/services.xml');
+
     }
 
 }

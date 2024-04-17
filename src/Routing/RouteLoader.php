@@ -3,6 +3,7 @@
 namespace Kikwik\AdminkBundle\Routing;
 
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 class RouteLoader extends Loader
@@ -16,10 +17,35 @@ class RouteLoader extends Loader
         }
         $routes = new RouteCollection();
 
-        // TODO: load routes....
+        // dashboard
+        $routes->add('kikwik_admink_dashboard', new Route(
+            '/',
+            [
+                '_controller' => 'kikwik_admink.controller.dashboard_controller::dashboard',
+            ],
+            [],
+            [],
+            null,
+            [],
+            ['GET'],
+            null
+        ));
+        $routes->add('kikwik_admink_clear_cache', new Route(
+            '/_clear_cache',
+            [
+                '_controller' => 'kikwik_admink.controller.dashboard_controller::clearCache',
+            ],
+            [],
+            [],
+            null,
+            [],
+            ['GET'],
+            null
+        ));
+
+
 
         $this->isLoaded = true;
-
         return $routes;
     }
 
