@@ -14,90 +14,21 @@
                 </li>
             </ul>
 
-{#            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">#}
-{#                <span>Prodotti</span>#}
-{#            </h6>#}
-{#            <ul class="nav flex-column mb-auto">#}
-{#                <li class="nav-item">#}
-{#                    <a class="nav-link d-flex align-items-center gap-2" href="{{ path('app_admin_famiglia_list') }}">#}
-{#                        <i class="bi bi-lightbulb"></i>#}
-{#                        Famiglie#}
-{#                    </a>#}
-{#                </li>#}
-{#                <li class="nav-item">#}
-{#                    <a class="nav-link d-flex align-items-center gap-2" href="{{ path('app_admin_codice_list') }}">#}
-{#                        <i class="bi bi-lightbulb-fill"></i>#}
-{#                        Codici#}
-{#                    </a>#}
-{#                </li>#}
-{#            </ul>#}
-
-{#            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">#}
-{#                <span>Attributi</span>#}
-{#            </h6>#}
-{#            <ul class="nav flex-column mb-auto">#}
-{#                <li class="nav-item">#}
-{#                    <a class="nav-link d-flex align-items-center gap-2" href="{{ path('app_admin_colore_list') }}">#}
-{#                        <i class="bi bi-palette"></i>#}
-{#                        Colori#}
-{#                    </a>#}
-{#                </li>#}
-{#                <li class="nav-item">#}
-{#                    <a class="nav-link d-flex align-items-center gap-2" href="{{ path('app_admin_materiale_list') }}">#}
-{#                        <i class="bi bi-bricks"></i>#}
-{#                        Materiali#}
-{#                    </a>#}
-{#                </li>#}
-{#            </ul>#}
-
-{#            <hr class="my-3">#}
-
-{#            {{ component('SiteSwitcher') }}#}
-
-{#            <hr class="my-3">#}
-
-{#            <ul class="nav flex-column mb-auto">#}
-{#                <li class="nav-item">#}
-{#                    <a class="nav-link d-flex align-items-center gap-2" href="{{ path('api_entrypoint') }}">#}
-{#                        <i class="bi bi-gear"></i>#}
-{#                        API#}
-{#                    </a>#}
-{#                </li>#}
-{#            </ul>#}
-
-{#            <hr class="my-3">#}
-
-
-{#            <ul class="nav flex-column mb-auto">#}
-{#                {% if is_granted('IS_AUTHENTICATED') %}#}
-{#                    <li class="nav-item">#}
-{#                        <span class="nav-link d-flex align-items-center gap-2">#}
-{#                            <i class="bi bi-person-circle"></i>#}
-{#                            {{ app.user }}#}
-{#                        </span>#}
-{#                    </li>#}
-{#                    <li class="nav-item">#}
-{#                        <a class="nav-link d-flex align-items-center gap-2" href="{{ path('kikwik_user_password_change') }}">#}
-{#                            <i class="bi bi-key"></i>#}
-{#                            {{ 'change_password.title'|trans({},'KikwikUserBundle') }}#}
-{#                        </a>#}
-{#                    </li>#}
-{#                    <li class="nav-item">#}
-{#                        <a class="nav-link d-flex align-items-center gap-2" href="{{ path('app_logout') }}">#}
-{#                            <i class="bi bi-box-arrow-right"></i>#}
-{#                            Logout#}
-{#                        </a>#}
-{#                    </li>#}
-{#                {% else %}#}
-{#                    <li class="nav-item">#}
-{#                        <a class="nav-link d-flex align-items-center gap-2" href="{{ path('app_login') }}">#}
-{#                            <i class="bi bi-box-arrow-right"></i>#}
-{#                            Login#}
-{#                        </a>#}
-{#                    </li>#}
-{#                {% endif %}#}
-{#            </ul>#}
-
+            {% for section in adminkonfig.sidebar %}
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
+                    <span>{{ section.title }}</span>
+                </h6>
+                <ul class="nav flex-column mb-auto">
+                    {% for admin in section.admins %}
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2 {% if app.current_route == admin.route %}active{% endif %}" href="{{ path(admin.route) }}">
+                                <i class="{{ admin.icon }}"></i>
+                                {{ admin.title }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
 
 
         </div>

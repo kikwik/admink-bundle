@@ -5,6 +5,7 @@ namespace Kikwik\AdminkBundle\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Kikwik\AdminkBundle\Interfaces\CRUDControllerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\Form\Form;
@@ -17,7 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-abstract class AbstractCRUDController
+abstract class AbstractCRUDController implements CRUDControllerInterface
 {
     protected string $baseRouteName;
 
@@ -122,6 +123,7 @@ abstract class AbstractCRUDController
         $content = $this->twig->render('@KikwikAdmink/crud/new.html.twig',[
             'singularName' => $this->getSingularName(),
             'form'=>$form->createView(),
+            'baseRouteName' => $this->baseRouteName,
         ]);
         return new Response($content);
     }
@@ -147,6 +149,7 @@ abstract class AbstractCRUDController
             'singularName' => $this->getSingularName(),
             'object'=>$object,
             'form'=>$form->createView(),
+            'baseRouteName' => $this->baseRouteName,
         ]);
         return new Response($content);
     }

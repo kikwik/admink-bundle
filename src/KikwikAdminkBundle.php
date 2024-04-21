@@ -2,6 +2,7 @@
 
 namespace Kikwik\AdminkBundle;
 
+use Kikwik\AdminkBundle\Interfaces\CRUDControllerInterface;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -39,6 +40,23 @@ class KikwikAdminkBundle extends AbstractBundle
                         ->scalarNode('change_password')->defaultValue('kikwik_user_password_change')->end()
                     ->end()
                 ->end()
+
+                ->arrayNode('sidebar')
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('title')->defaultNull()->end()
+                            ->arrayNode('admins')
+                                ->arrayPrototype()
+                                    ->children()
+                                        ->scalarNode('title')->end()
+                                        ->scalarNode('icon')->end()
+                                        ->scalarNode('route')->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
     }
@@ -49,11 +67,17 @@ class KikwikAdminkBundle extends AbstractBundle
         // load an XML, PHP or Yaml file
         $container->import('../config/services.xml');
 
+        $builder->registerForAutoconfiguration(CRUDControllerInterface::class)
+            ->addTag('kikwik.admink.controller')
+            ->addTag('controller.service_arguments')
+        ;
+
         $container->services()
             ->get('kikwik_admink.service.admin_konfig')
             ->arg('$adminTitle',$config['title'])
             ->arg('$assets',$config['assets'])
             ->arg('$routes',$config['routes'])
+            ->arg('$sidebar',$config['sidebar'])
         ;
     }
 

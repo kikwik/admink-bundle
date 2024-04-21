@@ -11,6 +11,7 @@ class AdminKonfig
         private string $adminTitle,
         private array $assets,
         private array $routes,
+        private array $sidebar,
     )
     {
     }
@@ -53,5 +54,10 @@ class AdminKonfig
         return $this->router->getRouteCollection()->get($route)
             ? $route
             : null;
+    }
+
+    public function getSidebar(): array
+    {
+        return $this->sidebar;
     }
 }

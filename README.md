@@ -24,7 +24,43 @@ kikwik_admink_bundle:
     prefix: '/admin/{_locale}'
 ```
 
-3. Configure admin in `config/packages/kikwik_admink.yaml`:
+3. Make your admin controller extends `Kikwik\AdminkBundle\Controller\AbstractCRUDController`:
+
+```php
+namespace App\Controller\Admin;
+
+use App\Entity\Famiglia;
+use App\Form\FamigliaFormType;
+use Kikwik\AdminkBundle\Controller\AbstractCRUDController;
+use Symfony\Component\Routing\Attribute\Route;
+
+#[Route('/admin/{_locale}/famiglia', name: 'app_admin_famiglia')]
+class FamigliaController extends AbstractCRUDController
+{
+    protected function getEntityClass(): string
+    {
+        return Famiglia::class;
+    }
+
+    protected function getListFields(): array
+    {
+        return [
+            'nome'=> 'Nome',
+            'tipo' => 'Tipo',
+            'descrizione' => 'Descrizione',
+            'numProdotti' => '# codici',
+        ];
+    }
+    
+    protected function getFormClass(): ?string
+    {
+        return FamigliaFormType::class;
+    }
+}
+```
+
+
+4. Configure admin in `config/packages/kikwik_admink.yaml`:
 
 ```yaml
 kikwik_admink:
@@ -36,4 +72,16 @@ kikwik_admink:
         login: 'app_login'
         logout: 'app_logout'
         change_password: 'kikwik_user_password_change'
+
+    sidebar:
+        -
+            title: Prodotti
+            admins:
+                - { title: Famiglie, icon: bi bi-lightbulb, route: app_admin_famiglia_list }
+                - { title: Codici, icon: bi bi-lightbulb-fill, route: app_admin_codice_list }
+        -
+            title: Attributi
+            admins:
+                - { title: Colori, icon: bi bi-palette, route: app_admin_colore_list }
+                - { title: Materiali, icon: bi bi-bricks, route: app_admin_materiale_list }
 ```
