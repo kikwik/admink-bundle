@@ -13,7 +13,9 @@
         "php": ">=8.1",
         "symfony/framework-bundle": "^6.4",
         "symfony/form": "^6.4",
-        "twig/twig": "^3.8",
+        "symfony/security-bundle": "^6.4",
+        "symfony/asset": "^6.4",
+        "symfony/twig-bundle": "^6.4",
         "babdev/pagerfanta-bundle": "^4.0",
         "pagerfanta/doctrine-orm-adapter": "^4.0",
         "pagerfanta/twig": "^4.0"

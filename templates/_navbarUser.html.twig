@@ -1,0 +1,24 @@
+<ul class="nav nav-pills">
+    <li class="nav-item dropstart">
+        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"><i class="bi bi-person-circle"></i></a>
+        <ul class="dropdown-menu">
+            {% if is_granted('IS_AUTHENTICATED') %}
+                <li><a class="dropdown-item">{{ app.user }}</a></li>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li><a class="dropdown-item" href="{{ path('kikwik_admink_dashboard') }}"><i class="bi bi-gear"></i> Admin dashboard</a></li>
+                {% endif %}
+                {% if adminkonfig.changePasswordRoute %}
+                    <li><a class="dropdown-item" href="{{ path(adminkonfig.changePasswordRoute) }}"><i class="bi bi-key"></i> {{ 'change_password.title'|trans({},'KikwikUserBundle') }}</a></li>
+                {% endif %}
+                <li><hr class="dropdown-divider"></li>
+                {% if adminkonfig.logoutRoute %}
+                    <li><a class="dropdown-item" href="{{ path(adminkonfig.logoutRoute) }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                {% endif %}
+            {% else %}
+                {% if adminkonfig.loginRoute %}
+                    <li><a class="dropdown-item" href="{{ path(adminkonfig.loginRoute) }}"><i class="bi bi-box-arrow-right"></i> Login</a></li>
+                {% endif %}
+            {% endif %}
+        </ul>
+    </li>
+</ul>
