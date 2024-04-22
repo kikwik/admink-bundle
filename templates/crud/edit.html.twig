@@ -5,5 +5,5 @@
 {% block body %}
     <h1>Modifica {{ singularName }} {{ object }}</h1>
 
-    {{ include('@KikwikAdmink/crud/_form.html.twig', { form: form }) }}
+    {{ include(['admink/'~baseRouteName~'/_form.html.twig','@KikwikAdmink/crud/_form.html.twig'], { form: form }) }}
 {% endblock %}

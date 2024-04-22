@@ -24,7 +24,7 @@
                             <a href="{{ path(baseRouteName~'_edit', { id: object.id }) }}"><i class="bi bi-pencil-fill"></i></a>
                         </td>
                         {% for fieldName, label in listFields %}
-                            <td>{{ attribute(object,fieldName) }}</td>
+                            <td>{{ include(['admink/'~baseRouteName~'/_display_'~fieldName~'.html.twig','@KikwikAdmink/crud/_displayValue.html.twig'], { object: object, fieldName: fieldName }) }}</td>
                         {% endfor %}
                     </tr>
                 {% endfor %}

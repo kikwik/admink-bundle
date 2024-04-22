@@ -1,0 +1,16 @@
+{% set value = attribute(object,fieldName) %}
+
+
+{% if value.timestamp is defined %}
+    {% if '00:00:00' == value.format('H:m:i') %}
+        {{ value | format_date('medium') }}
+    {% else %}
+        {{ value | format_datetime('medium', 'short') }}
+    {% endif %}
+{% elseif value is iterable %}
+    {% for item in value %}
+        <span class="badge text-bg-light">{{ item | raw }}</span>
+    {% endfor %}
+{% else %}
+    {{ value | raw }}
+{% endif %}
