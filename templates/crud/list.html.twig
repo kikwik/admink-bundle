@@ -6,6 +6,8 @@
     <h1>Elenco {{ pluralName }}</h1>
     <a href="{{ path(baseRouteName~'_new') }}"><i class="bi bi-plus-circle"></i></a>
 
+    {{ include(['admink/'~baseRouteName~'/_filters.html.twig','@KikwikAdmink/crud/_filters.html.twig'], { filter: filter }) }}
+
     <p>{{ pager.nbResults }} {{ pluralName }}</p>
     <div class="table-responsive small">
         <table class="table table-hover table-striped">
