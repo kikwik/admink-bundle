@@ -13,7 +13,9 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -30,6 +32,7 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
         private Environment $twig,
         private FormFactoryInterface $formFactory,
         private UrlGeneratorInterface $urlGenerator,
+        private RequestStack $requestStack,
     )
     {
         // find baseRoutename from Route attribute
@@ -76,15 +79,45 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
 
     protected abstract function getListFields(): array;
 
-    protected function getFormClass(): ?string
+    protected function getSortPaths(): array
     {
-        return null;
+        return [];
     }
+
+    protected abstract function getFormClass(): ?string;
 
     protected function getExportFields(): ?array
     {
         return null;
     }
+
+    /**************************************/
+    /* SESSION                            */
+    /**************************************/
+
+    private function getSessionAttributes()
+    {
+        return $this->requestStack->getSession()->get($this->baseRouteName,[]);
+    }
+    private function setSessionAttributes(array $attributes)
+    {
+        $this->requestStack->getSession()->set($this->baseRouteName,$attributes);
+    }
+
+
+    private function getCurrentSort(): ?array
+    {
+        $sessioneAttributes = $this->getSessionAttributes();
+        return $sessioneAttributes['sort'] ?? null;
+    }
+
+    private function setCurrentSort(string $field, string $dir = 'asc')
+    {
+        $sessioneAttributes = $this->getSessionAttributes();
+        $sessioneAttributes['sort'] = [$field,$dir];
+        $this->setSessionAttributes($sessioneAttributes);
+    }
+
 
     /**************************************/
     /* ROUTES                             */
@@ -94,9 +127,16 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
     public function list(
         #[MapQueryParameter] int $page = 1,
         #[MapQueryParameter] array $filter = [],
+        #[MapQueryParameter] string $sortField = '',
+        #[MapQueryParameter] string $sortDir = 'asc',
         $_locale = 'it'
     ): Response
     {
+        if($sortField)
+        {
+            $this->setCurrentSort($sortField, $sortDir);
+        }
+
         $pager = Pagerfanta::createForCurrentPageWithMaxPerPage(
             new QueryAdapter($this->getListQuery($filter)),
             $page,
@@ -106,6 +146,8 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
         $content = $this->twig->render('@KikwikAdmink/crud/list.html.twig', [
             'pluralName' => $this->getPluralName(),
             'listFields' => $this->getListFields(),
+            'sortPaths' => $this->getSortPaths(),
+            'currentSort' => $this->getCurrentSort(),
             'exportFields' => $this->getExportFields(),
             'baseRouteName' => $this->baseRouteName,
             'pager'=>$pager,
@@ -236,7 +278,17 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
 
     protected function getListQuery(array $filters): QueryBuilder
     {
-        return $this->entityManager->getRepository($this->getEntityClass())
+        $qb = $this->entityManager->getRepository($this->getEntityClass())
             ->createQueryBuilder('object');
+        if($this->getCurrentSort())
+        {
+            list($sortField, $sortDir) = $this->getCurrentSort();
+            $sortPaths = $this->getSortPaths();
+            if(isset($sortPaths[$sortField]))
+            {
+                $qb->orderBy($sortPaths[$sortField], $sortDir);
+            }
+        }
+        return $qb;
     }
 }

@@ -20,7 +20,24 @@
                 <tr>
                     <th>Azioni</th>
                     {% for fieldName, label in listFields %}
-                        <th>{{ label }}</th>
+                        <th>
+                            <span style="white-space: nowrap">
+                                {{ label }}
+                                {% if sortPaths[fieldName] is defined %}
+
+                                    {% if currentSort[1] is defined and currentSort[0] == fieldName %}
+                                        {% if 'asc' == currentSort[1] %}
+                                            <a href="?sortField={{ fieldName }}&sortDir=desc"><i class="bi bi-arrow-down-circle-fill"></i></a>
+                                        {% else %}
+                                            <a href="?sortField={{ fieldName }}&sortDir=asc"><i class="bi bi-arrow-up-circle-fill"></i></a>
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="?sortField={{ fieldName }}"><i class="bi bi-arrow-down-up"></i></a>
+                                    {% endif %}
+
+                                {% endif %}
+                            </span>
+                        </th>
                     {% endfor %}
                 </tr>
             </thead>
