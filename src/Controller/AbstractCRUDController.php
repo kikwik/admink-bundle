@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Kikwik\AdminkBundle\Interfaces\CRUDControllerInterface;
+use Knp\DoctrineBehaviors\Contract\Entity\TranslationInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\Form\Form;
@@ -13,7 +14,9 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
@@ -78,6 +81,11 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
         return null;
     }
 
+    protected function getExportFields(): ?array
+    {
+        return null;
+    }
+
     /**************************************/
     /* ROUTES                             */
     /**************************************/
@@ -98,11 +106,79 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
         $content = $this->twig->render('@KikwikAdmink/crud/list.html.twig', [
             'pluralName' => $this->getPluralName(),
             'listFields' => $this->getListFields(),
+            'exportFields' => $this->getExportFields(),
             'baseRouteName' => $this->baseRouteName,
             'pager'=>$pager,
             'filter'=>$filter,
         ]);
         return new Response($content);
+    }
+
+    #[Route('/export', name: '_export')]
+    public function export()
+    {
+        ini_set('memory_limit','500M');
+        $qb = $this->getListQuery([]);
+        $response = new StreamedResponse(function () use ($qb) {
+            $csv = fopen('php://output', 'w+');
+            fputcsv($csv, array_values($this->getExportFields()), ';');
+            $data = $qb->getQuery()->iterate();
+            $propertyAccessor = PropertyAccess::createPropertyAccessor();
+            while (false !== ($line = $data->next()))
+            {
+                $object = $line[0];
+                $csvData = [];
+                foreach($this->getExportFields() as $property => $label)
+                {
+                    try{
+                        $value = '';
+
+                        if(str_starts_with($property, 'translations.'))
+                        {
+                            list($transRelation, $transLocale, $transProperty) = explode('.',$property);
+                            $trans = $propertyAccessor->getValue($object, $transRelation);
+                            /** @var TranslationInterface $tran */
+                            foreach($trans as $tran)
+                            {
+                                if($tran->getLocale() == $transLocale)
+                                {
+                                    $value = $propertyAccessor->getValue($tran, $transProperty);
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            $value = $propertyAccessor->getValue($object, $property);
+                            if(is_array($value))
+                            {
+                                $value = implode(', ',$value);
+                            }
+                            if($value instanceof \DateTimeInterface)
+                            {
+                                $value = $value->format('Y-m-d H:i:s');
+                            }
+                            if(is_bool($value))
+                            {
+                                $value = $value ? 'SI' : 'NO';
+                            }
+                        }
+
+                        $csvData[] = strip_tags($value);
+                    }
+                    catch (\Throwable $e)
+                    {
+                        $csvData[] = $e->getMessage();
+                    }
+                }
+                fputcsv($csv, $csvData, ';');
+            }
+            fclose($csv);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$this->getPluralName().'.csv"');
+        return $response;
     }
 
     #[Route('/new', name: '_new')]
@@ -160,6 +236,7 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
 
     protected function getListQuery(array $filters): QueryBuilder
     {
-        return $this->entityManager->getRepository($this->getEntityClass())->createQueryBuilder('object');
+        return $this->entityManager->getRepository($this->getEntityClass())
+            ->createQueryBuilder('object');
     }
 }

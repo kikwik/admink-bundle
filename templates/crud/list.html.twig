@@ -4,7 +4,12 @@
 
 {% block body %}
     <h1>Elenco {{ pluralName }}</h1>
-    <a href="{{ path(baseRouteName~'_new') }}"><i class="bi bi-plus-circle"></i></a>
+    <div class="actions mb-3">
+        {% if exportFields %}
+            <a class="btn btn-outline-secondary float-end" href="{{ path(baseRouteName~'_export') }}"><i class="bi bi-filetype-csv"></i> Esporta</a>
+        {% endif %}
+        <a class="btn btn-outline-primary" href="{{ path(baseRouteName~'_new') }}"><i class="bi bi-plus-circle"></i> Aggiungi</a>
+    </div>
 
     {{ include(['admink/'~baseRouteName~'/_filters.html.twig','@KikwikAdmink/crud/_filters.html.twig'], { filter: filter }) }}
 
