@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Kikwik\AdminkBundle\Interfaces\CRUDControllerInterface;
+use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslationInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
@@ -175,7 +176,7 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
         }
 
         $pager = Pagerfanta::createForCurrentPageWithMaxPerPage(
-            new QueryAdapter($this->getListQuery($this->getCurrentFilters())),
+            new QueryAdapter($this->getListQuery()),
             $page,
             20
         );
@@ -197,7 +198,7 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
     public function export()
     {
         ini_set('memory_limit','500M');
-        $qb = $this->getListQuery([]);
+        $qb = $this->getListQuery();
         $response = new StreamedResponse(function () use ($qb) {
             $csv = fopen('php://output', 'w+');
             fputcsv($csv, array_values($this->getExportFields()), ';');
@@ -313,10 +314,25 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
     /* HELPERS                            */
     /**************************************/
 
-    protected function getListQuery(array $filters): QueryBuilder
+    private function getListQuery(): QueryBuilder
     {
-        $qb = $this->entityManager->getRepository($this->getEntityClass())
-            ->createQueryBuilder('object');
+        $repository = $this->entityManager->getRepository($this->getEntityClass());
+        if(method_exists($repository, 'createAdminQueryBuilder'))
+        {
+            $qb = $repository->createAdminQueryBuilder($this->getCurrentFilters());
+        }
+        elseif(in_array(TranslatableInterface::class, class_implements($this->getEntityClass())))
+        {
+            $qb = $repository->createQueryBuilder('object')
+                ->leftJoin('object.translations','translation')
+                ->andWhere('translation.locale = :locale')->setParameter('locale',$this->requestStack->getCurrentRequest()->getLocale())
+                ->addSelect('translation')
+            ;
+        }
+        else
+        {
+            $qb = $repository->createQueryBuilder('object');
+        }
         if($this->getCurrentSort())
         {
             list($sortField, $sortDir) = $this->getCurrentSort();
