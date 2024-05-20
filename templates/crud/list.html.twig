@@ -11,7 +11,7 @@
         <a class="btn btn-outline-primary" href="{{ path(baseRouteName~'_new') }}"><i class="bi bi-plus-circle"></i> Aggiungi</a>
     </div>
 
-    {{ include(['admink/'~baseRouteName~'/_filters.html.twig','@KikwikAdmink/crud/_filters.html.twig'], { filter: filter }) }}
+    {{ include(['admink/'~baseRouteName~'/_filters.html.twig','@KikwikAdmink/crud/_filters.html.twig'], { filterForm: filterForm }) }}
 
     <p>{{ pager.nbResults }} {{ pluralName }}</p>
     <div class="table-responsive small">

@@ -1,0 +1,41 @@
+{% if filterForm %}
+
+    {% set popoverContent %}
+        {% set count = 0 %}
+        <ul>
+            {% for field,value in filterForm.vars.value %}
+                {% if value %}
+                    <li>{{ field }}: <b>{{ value }}</b></li>
+                    {% set count = count + 1 %}
+                {% endif %}
+            {% endfor %}
+        </ul>
+        {% if not count %}nessun filtro{% endif %}
+    {% endset %}
+
+
+    <button class="btn {% if count %}btn-warning{% else %}btn-outline-primary{% endif%} float-end" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+        <span data-bs-toggle="popover" data-bs-trigger="hover" data-bs-html="true" title="Filtri attivi" data-bs-content="{{ popoverContent|e('html_attr') }}">Cerca...</span>
+    </button>
+
+
+
+
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+        <div class="offcanvas-header">
+            <h5 id="offcanvasRightLabel">Filtri di ricerca</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            {% form_theme filterForm 'bootstrap_5_layout.html.twig' %}
+            {{ form_start(filterForm, {'attr': {'novalidate': 'novalidate'}}) }}
+                {{ form_widget(filterForm) }}
+                <div class="float-end">
+                    <button type="submit" class="btn btn-outline-primary">Cerca</button>
+                    <a href="{{ path(baseRouteName~'_list') }}?filter_reset=1" class="btn btn-outline-secondary">Reset</a>
+                </div>
+            {{ form_end(filterForm) }}
+        </div>
+    </div>
+{% endif %}

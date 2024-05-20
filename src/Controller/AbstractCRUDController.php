@@ -79,6 +79,11 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
 
     protected abstract function getListFields(): array;
 
+    protected function getFilterFormClass(): ?string
+    {
+        return null;
+    }
+
     protected function getSortPaths(): array
     {
         return [];
@@ -118,6 +123,18 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
         $this->setSessionAttributes($sessioneAttributes);
     }
 
+    private function getCurrentFilters(): array
+    {
+        $sessioneAttributes = $this->getSessionAttributes();
+        return $sessioneAttributes['filter'] ?? [];
+    }
+
+    private function setCurrentFilters(array $filter)
+    {
+        $sessioneAttributes = $this->getSessionAttributes();
+        $sessioneAttributes['filter'] = $filter;
+        $this->setSessionAttributes($sessioneAttributes);
+    }
 
     /**************************************/
     /* ROUTES                             */
@@ -125,8 +142,9 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
 
     #[Route('/', name: '_list')]
     public function list(
+        Request $request,
         #[MapQueryParameter] int $page = 1,
-        #[MapQueryParameter] array $filter = [],
+        #[MapQueryParameter] bool $filter_reset = false,
         #[MapQueryParameter] string $sortField = '',
         #[MapQueryParameter] string $sortDir = 'asc',
         $_locale = 'it'
@@ -136,9 +154,28 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
         {
             $this->setCurrentSort($sortField, $sortDir);
         }
+        if($filter_reset)
+        {
+            $this->setCurrentFilters([]);
+        }
+
+        $filterForm = null;
+        if($this->getFilterFormClass())
+        {
+            $filterForm = $this->formFactory->create($this->getFilterFormClass(), $this->getCurrentFilters(), [
+                'action'=>$this->urlGenerator->generate($this->baseRouteName.'_list'),
+                'method' => 'get',
+                'validation_groups' => false,
+            ]);
+            $filterForm->handleRequest($request);
+            if($filterForm->isSubmitted())
+            {
+                $this->setCurrentFilters($filterForm->getData());
+            }
+        }
 
         $pager = Pagerfanta::createForCurrentPageWithMaxPerPage(
-            new QueryAdapter($this->getListQuery($filter)),
+            new QueryAdapter($this->getListQuery($this->getCurrentFilters())),
             $page,
             20
         );
@@ -151,7 +188,7 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
             'exportFields' => $this->getExportFields(),
             'baseRouteName' => $this->baseRouteName,
             'pager'=>$pager,
-            'filter'=>$filter,
+            'filterForm'=>$filterForm?->createView(),
         ]);
         return new Response($content);
     }
