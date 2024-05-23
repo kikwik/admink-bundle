@@ -167,6 +167,7 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
                 'action'=>$this->urlGenerator->generate($this->baseRouteName.'_list'),
                 'method' => 'get',
                 'validation_groups' => false,
+                'csrf_protection' => false,
             ]);
             $filterForm->handleRequest($request);
             if($filterForm->isSubmitted())
