@@ -1,24 +1,41 @@
 {% if filterForm %}
 
+
     {% set popoverContent %}
-        {% set count = 0 %}
-        <ul>
+        {% set filtersCount = 0 %}
+        <dl>
             {% for field,value in filterForm.vars.value %}
-                {% if value %}
-                    <li>{{ field }}: <b>{{ value }}</b></li>
-                    {% set count = count + 1 %}
+                {% if value | length %}
+                    <dd>{{ field }}</dd>
+                    <dt>
+                        {% if value is iterable %}
+                            <ul>
+                                {% for item in value %}
+                                    <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <ul><li>{{ value }}</li></ul>
+                        {% endif %}
+                    </dt>
+                    {% set filtersCount = filtersCount + 1 %}
                 {% endif %}
             {% endfor %}
-        </ul>
-        {% if not count %}nessun filtro{% endif %}
+        </dl>
+        {% if not filtersCount %}nessun filtro{% endif %}
     {% endset %}
 
 
-    <button class="btn {% if count %}btn-warning{% else %}btn-outline-primary{% endif%} float-end" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
-        <span data-bs-toggle="popover" data-bs-trigger="hover" data-bs-html="true" title="Filtri attivi" data-bs-content="{{ popoverContent|e('html_attr') }}">Cerca...</span>
-    </button>
+    {% if filtersCount %}
+        <button class="btn btn-warning float-end" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+            <span data-bs-toggle="popover" data-bs-trigger="hover" data-bs-html="true" title="Filtri attivi" data-bs-content="{{ popoverContent|e('html_attr') }}">Filtri attivi!</span>
+        </button>
 
-
+    {% else %}
+        <button class="btn btn-outline-primary float-end" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+            Cerca...
+        </button>
+    {% endif %}
 
 
 
@@ -31,8 +48,8 @@
             {% form_theme filterForm 'bootstrap_5_layout.html.twig' %}
             {{ form_start(filterForm, {'attr': {'novalidate': 'novalidate'}}) }}
                 {{ form_widget(filterForm) }}
-                <div class="float-end">
-                    <button type="submit" class="btn btn-outline-primary">Cerca</button>
+                <div>
+                    <button type="submit" class="btn btn-outline-primary float-end">Cerca</button>
                     <a href="{{ path(baseRouteName~'_list') }}?filter_reset=1" class="btn btn-outline-secondary">Reset</a>
                 </div>
             {{ form_end(filterForm) }}

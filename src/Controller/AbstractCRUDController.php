@@ -12,6 +12,7 @@ use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -160,10 +161,12 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
             $this->setCurrentFilters([]);
         }
 
+        // filter form
         $filterForm = null;
-        if($this->getFilterFormClass())
+        $filterFormType =$this->getFilterFormClass();
+        if($filterFormType)
         {
-            $filterForm = $this->formFactory->create($this->getFilterFormClass(), $this->getCurrentFilters(), [
+            $filterForm = $this->formFactory->create($filterFormType, $this->getCurrentFilters(), [
                 'action'=>$this->urlGenerator->generate($this->baseRouteName.'_list'),
                 'method' => 'get',
                 'validation_groups' => false,
