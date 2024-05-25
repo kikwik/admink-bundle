@@ -9,7 +9,7 @@
     {% endif %}
 {% elseif value is iterable %}
     {% for item in value %}
-        <span class="badge text-bg-light">{{ item | raw }}</span>
+        <span class="badge text-bg-secondary">{{ item | raw }}</span>
     {% endfor %}
 {% else %}
     {{ value | raw }}

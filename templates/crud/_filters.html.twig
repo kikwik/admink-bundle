@@ -39,16 +39,16 @@
 
 
 
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas offcanvas-end w-50" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
         <div class="offcanvas-header">
             <h5 id="offcanvasRightLabel">Filtri di ricerca</h5>
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            {% form_theme filterForm 'bootstrap_5_layout.html.twig' %}
+            {% form_theme filterForm 'bootstrap_5_horizontal_layout.html.twig' %}
             {{ form_start(filterForm, {'attr': {'novalidate': 'novalidate'}}) }}
                 {{ form_widget(filterForm) }}
-                <div>
+                <div class="mt-3">
                     <button type="submit" class="btn btn-outline-primary float-end">Cerca</button>
                     <a href="{{ path(baseRouteName~'_list') }}?filter_reset=1" class="btn btn-outline-secondary">Reset</a>
                 </div>
