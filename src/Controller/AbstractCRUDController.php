@@ -202,7 +202,7 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
     public function export()
     {
         ini_set('memory_limit','500M');
-        $qb = $this->getListQuery();
+        $qb = $this->entityManager->getRepository($this->getEntityClass())->createQueryBuilder('object');
         $response = new StreamedResponse(function () use ($qb) {
             $csv = fopen('php://output', 'w+');
             fputcsv($csv, array_values($this->getExportFields()), ';');
