@@ -327,11 +327,20 @@ abstract class AbstractCRUDController implements CRUDControllerInterface
         }
         elseif(in_array(TranslatableInterface::class, class_implements($this->getEntityClass())))
         {
+
             $qb = $repository->createQueryBuilder('object')
                 ->leftJoin('object.translations','translation')
-                ->andWhere('translation.locale = :locale')->setParameter('locale',$this->requestStack->getCurrentRequest()->getLocale())
                 ->addSelect('translation')
             ;
+            if($this->getCurrentSort())
+            {
+                list($sortField, $sortDir) = $this->getCurrentSort();
+                $sortPaths = $this->getSortPaths();
+                dump($sortPaths[$sortField]);
+                if(str_starts_with($sortPaths[$sortField],'translation')){
+                    $qb->andWhere('translation.locale = :locale')->setParameter('locale',$this->requestStack->getCurrentRequest()->getLocale());
+                }
+            }
         }
         else
         {
